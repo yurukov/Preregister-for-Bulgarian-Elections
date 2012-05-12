@@ -1,7 +1,7 @@
 Preregister-for-Bulgarian-Elections
 ===================================
 
-This is a website that allows people to register for updates for the Bulgarian elections, group and organize for initiating new voting sections outside of Bulgaria. I am sharing it so that people can use it to quickly build Google forms based applications. A php script connects to the Google spreadsheet that collects the data from you form, geocodes it and saves it into a json format. The javascript website on the other hand loads the data and clusters it on a map. 
+This is a website that allows people to register for updates for the Bulgarian elections, group and organize for initiating new voting sections outside of Bulgaria. You can view it on http://vote.yurukov.net/. I am sharing it so that people can use it to quickly build Google forms based applications. A php script connects to the Google spreadsheet that collects the data from you form, geocodes it and saves it into a json format. The javascript website on the other hand loads the data and clusters it on a map. 
 
 Here are some important things to be aware of:
 - this site is in Bulgarian and contains several pages - map, form and about page

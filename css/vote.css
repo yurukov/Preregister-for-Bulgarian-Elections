@@ -1,0 +1,47 @@
+body {
+	font-family:Verdana;
+	margin:0;
+	padding:0;
+}
+h1, #header, #map, #votebox, #about, #footer, #buttons {
+	padding:0;
+	width: 900px;
+	margin:30px auto;
+	text-align:center;
+}
+#header {
+	font-size:150%;
+}
+#map {		
+	height:550px;
+}
+#votebox iframe {
+	margin:0 auto;
+}
+#about, #buttons {
+	width: 600px;
+	text-align:justify;
+}
+#footer {
+	clear:both;
+	width: 600px;
+	font-size:80%;
+	text-align:center;
+	padding:20px 0;
+}
+#buttons {
+	width:306px;
+	display:block;
+}
+#buttons li {
+	width:100px;
+	height:65px;
+	display:block;
+	float:left;
+	overflow:hidden;
+	text-align:center;
+}
+
+#buttons li div, #buttons li iframe {
+	display:inline;
+}

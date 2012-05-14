@@ -16,9 +16,12 @@ This class is best used with a cronjob like this:
 
 mb_internal_encoding("UTF-8");
 
+$datafile = "data/data.json.gz";
+
 //the path yo your ZEND libs
 set_include_path("/home/yurukov1/libs/");
 include_once("Google_Spreadsheet.php");
+include("secret.php");
 include_once("config.php");
 
 //access settings should be defined in config.php 
@@ -34,11 +37,11 @@ for ($i=0;$i<count($rows);$i++)
 	$data[]=array($rows[$i]["timestamp"], trim(str_replace("\"\"","'",$rows[$i][$address_column])));
 
 //check and load the old data
-if (file_exists("data/data.json.gz"))
+if (file_exists($datafile)) {
 	// Swap the lines in case you don't want gziped data 
 	//$olddata = json_decode(file_get_contents("data/data.json"));
-	$olddata = json_decode(implode("",gzfile("data/data.json.gz")));
-else
+	$olddata = json_decode(implode("",gzfile($datafile)));
+} else
 	$olddata = array();
 
 // init updated data and addesses that can't be found
@@ -77,7 +80,7 @@ for ($i=0;$i<count($data);$i++) {
 if (json_encode($olddata)!=json_encode($newlines)) {
 	// Swap the lines in case you don't want gziped data 
 	//file_put_contents("data/data.json",json_encode($newlines));
-	$f = fopen ( "data/data.json.gz", 'w' );
+	$f = fopen ( $datafile, 'w' );
 	fwrite ( $f,  gzencode ( json_encode($newlines) , 9 ));
 	fclose ( $f );
 }

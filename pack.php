@@ -1,15 +1,15 @@
 <?php
 
-/*
+/*********************************************************
 
 (CC) Boyan Yurukov http://yurukov.net/blog
 
 Usage: http://...../pack.php?secret
-Forsed rebuild: http://...../pack.php?secret&forse
+Forsed rebuild: http://...../pack.php?secret&force
 
 "secret" is defined in secret.php
 
-*/
+*********************************************************/
 
 include("secret.php");
 

@@ -3,14 +3,23 @@ body {
 	margin:0;
 	padding:0;
 }
-h1, #header, #map, #votebox, #about, #footer, #buttons {
+h1, h3, #header, #map, #votebox, #about, #footer, #buttons {
 	padding:0;
 	width: 900px;
 	margin:30px auto;
 	text-align:center;
 }
+h1 {
+	font-size:26pt;
+	margin-bottom:8px;
+}
+h3 {
+	margin-top:8px;
+	font-size:14pt;
+	font-weight:normal;
+}
 #header {
-	font-size:150%;
+	font-size:17pt;
 }
 #map {		
 	height:550px;
@@ -18,19 +27,25 @@ h1, #header, #map, #votebox, #about, #footer, #buttons {
 #votebox iframe {
 	margin:0 auto;
 }
-#about, #buttons {
+#about {
 	width: 600px;
+	font-size:11pt;
+}
+#about p,#about ol li {
 	text-align:justify;
+	margin-top:10px;
 }
 #footer {
 	clear:both;
-	width: 600px;
-	font-size:80%;
+	width: 900px;
+	font-size:10pt;
 	text-align:center;
 	padding:20px 0;
+	line-height:160%;
 }
 #buttons {
 	width:306px;
+	text-align:justify;
 	display:block;
 }
 #buttons li {

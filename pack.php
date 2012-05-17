@@ -29,7 +29,8 @@ if ($all1>0)
 
 function pack_file($path) {
 	global $force, $all1, $all2, $ignore;
-	if (is_dir($path)) {
+	$gzpath=createGzName($path);
+	if (is_dir($path) && $path!="./pos") {
 		if ($handle = opendir($path)) {
 			while (false !== ($file = readdir($handle)))
 				if ($file != "." && $file != "..") 
@@ -37,8 +38,8 @@ function pack_file($path) {
 		}
 		closedir($handle);
 	} else 
-	if (!in_array(substr($path,2),$ignore) && (substr($path,-4)==".css" || substr($path,-3)==".js" || substr($path,-5)==".html" || substr($path,-5)==".json")) {
-		if (!$force && file_exists($path.".gz") && filectime($path)<filectime($path.".gz")) {
+	if (!in_array(substr($path,2),$ignore) && (substr($path,-4)==".css" || substr($path,-3)==".js" || substr($path,-5)==".html" || substr($path,-5)==".json" || substr($path,-4)==".csv")) {
+		if (!$force && file_exists($gzpath) && filectime($path)<filectime($gzpath)) {
 			echo "<span style='color:gray'>$path ... no update. Skip</span><br/>";
 		} else {
 			$content=file_get_contents($path);
@@ -47,11 +48,19 @@ function pack_file($path) {
 			$all2+=strlen($encoded);
 			echo "$path <span style='color:green'> ".strlen($content)."/".strlen($encoded)." ".round(100-strlen($encoded)/strlen($content)*100)."% </span><br/>";
 
-			$f = fopen ( $path.".gz", 'w' );
+			$f = fopen ( $gzpath, 'w' );
 			fwrite ( $f,  $encoded);
 			fclose ( $f );
 		}
 	}
+}
+
+function createGzName($path) {
+	if (strpos($path,"/")===false)
+		return ".".$path.".gz";
+	else
+		return substr($path,0,strrpos($path,"/"))."/.".substr($path,strrpos($path,"/")+1).".gz";
+
 }
 
 ?>

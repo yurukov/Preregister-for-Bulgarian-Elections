@@ -60,3 +60,32 @@ h3 {
 #buttons li div, #buttons li iframe {
 	display:inline;
 }
+
+#posolstvo-button {
+	margin:5px 0px;
+	height:60px;
+	cursor:pointer;
+}
+
+#reg-button {
+	margin:5px 1px 5px 9px;
+	height:60px;
+	cursor:pointer;
+}
+#sec-button {
+	margin:12px 10px 13px 15px;
+	height:45px;
+	cursor:pointer;
+}
+
+.infodiv {
+	text-align:left;
+	font-size:14px;
+}
+.infodiv h3 {
+	text-align:align;
+	font-size:14px;
+	width:auto;
+	margin:3px 0;
+	font-weight:bold;
+}

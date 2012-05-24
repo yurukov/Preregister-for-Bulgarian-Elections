@@ -61,21 +61,15 @@ h3 {
 	display:inline;
 }
 
-#posolstvo-button {
+#posolstvo-button, #reg-button, #sec-button {
 	margin:5px 0px;
 	height:60px;
 	cursor:pointer;
+	position:relative;
+	left:25px;
 }
-
-#reg-button {
-	margin:5px 1px 5px 9px;
-	height:60px;
-	cursor:pointer;
-}
-#sec-button {
-	margin:12px 10px 13px 15px;
-	height:45px;
-	cursor:pointer;
+.menu_button_pop {
+	left:10px;
 }
 
 .infodiv {

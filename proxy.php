@@ -89,9 +89,9 @@ for ($i=0;$i<count($data);$i++) {
 	// geocode the location
 	$geo=getLocation($items[1]);
 	// list the addresses that can't be found
-	if (!$geo) {
+	if ($geo==0 || $geo==-1) {
 		$badaddessesnew=true;
-		$badaddesses[]=implode(",",$items);
+		$badaddesses[]=implode(",",$items) . ($geo==-1? " - адресът е в България": "");
 	} else
 		$items=array_merge($items,$geo);
 	$newlines[] = $items;
@@ -108,7 +108,7 @@ if (json_encode($olddata)!=json_encode($newlines)) {
 
 // Print out bad addesses. Useful for cron jobs and mailing
 if (count($badaddesses)>0 && ($badaddessesnew || isset($_GET["list"]))) {
-	echo "Проблеми адреси:\n";
+	echo "Проблемни адреси:\n";
 	echo implode("\n",$badaddesses);
 }
 
@@ -118,26 +118,43 @@ if (count($badaddesses)>0 && ($badaddessesnew || isset($_GET["list"]))) {
 function getLocation($address) {
 	set_time_limit(60);
 	$address = urlencode($address);
+	//wait 1/2 second so that Google won't throttle
 	usleep(500000);
+	//geotag the location
 	$geo = json_decode(file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?address=$address&sensor=false"));
-	if ($geo && count($geo->results)>0 && $geo->results[0]->geometry) {
-		$geom=$geo->results[0]->geometry;
-		$span=1;
-		if ($geom->bounds) {
-			$lat_span=abs(doubleval($geom->bounds->northeast->lat)-doubleval($geom->bounds->southwest->lat));
-			$lng_span=abs(doubleval($geom->bounds->northeast->lng)-doubleval($geom->bounds->southwest->lng));
-			$span = sqrt($lat_span*$lat_span+$lng_span*$lng_span)/4;
-			if ($span>1)
-				$span=1;
-		}
-		if ($geom->location) {
-			$lat = doubleval($geom->location->lat)+rand()/getrandmax()*rand()/getrandmax()*$span*sin(rand()/getrandmax()*2*pi());
-			$lng = doubleval($geom->location->lng)+rand()/getrandmax()*rand()/getrandmax()*$span*cos(rand()/getrandmax()*2*pi());
-			return array($lat,$lng);
+	//check the first result as it's the one with highest probability
+	if ($geo && count($geo->results)>0) {
+
+		//check if the addess is in Bulgaria
+		if ($geo->results[0]->address_components)
+			for ($i=0;$i<count($geo->results[0]->address_components);$i++) 
+				if ($geo->results[0]->address_components[$i]->long_name=="Bulgaria")
+					return -1;
+
+		//calculate the marker position
+		if ($geo->results[0]->geometry) {
+			$geom=$geo->results[0]->geometry;
+			$span=1;
+			
+			//get the city bounds, divide them by half and limit it to one unit
+			if ($geom->bounds) {
+				$lat_span=abs(doubleval($geom->bounds->northeast->lat)-doubleval($geom->bounds->southwest->lat));
+				$lng_span=abs(doubleval($geom->bounds->northeast->lng)-doubleval($geom->bounds->southwest->lng));
+				$span = ($lat_span+$lng_span)/4;
+				if ($span>1)
+					$span=1;
+			}
+
+			//get the center of the city and distribute the markers in radial pattern with random distance and degrees
+			if ($geom->location) {
+				$lat = doubleval($geom->location->lat)+rand()/getrandmax()*rand()/getrandmax()*$span*sin(rand()/getrandmax()*2*pi());
+				$lng = doubleval($geom->location->lng)+rand()/getrandmax()*rand()/getrandmax()*$span*cos(rand()/getrandmax()*2*pi());
+				return array($lat,$lng);
+			}
 		}
 	} 
 
-	return false;
+	return 0;
 }
 	
 ?>

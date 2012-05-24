@@ -5,6 +5,9 @@ var markers = null;
 var posolstva = null;
 var infowindow = null;
 
+var oldZoom = false;
+var bigIconsFromZoom = 6;
+
 var showKmlLayer = false;
 var showMarketClusterer = false;
 var showPosolstva = false;
@@ -33,7 +36,7 @@ function togglePosolstva() {
 	for (i=0;i<posolstva.length;i++)
 		if (!posolstva[i].samoSekciq && (showPosolstva || !posolstva[i].sekciq || !showSekcii) && posolstva[i].getMap()!=action)
 				posolstva[i].setMap(action);
-	$("#posolstvo-button").attr("src",showPosolstva?"img/pos_b1.png":"img/pos_b1_g.png");
+	$("#posolstvo-button").attr("src",showPosolstva?"img/menu_pos.png":"img/menu_pos_g.png");
 }
 
 function toggleSekcii() {
@@ -44,7 +47,7 @@ function toggleSekcii() {
 	for (i=0;i<posolstva.length;i++)
 		if (posolstva[i].sekciq && (showSekcii || posolstva[i].samoSekciq || !showPosolstva) && posolstva[i].getMap()!=action)
 				posolstva[i].setMap(action);
-	$("#sec-button").attr("src",showSekcii?"img/p_v1.png":"img/p_v1_g.png");
+	$("#sec-button").attr("src",showSekcii?"img/menu_vote.png":"img/menu_vote_g.png");
 }
 
 
@@ -60,7 +63,7 @@ function toggleMarkerClusterer() {
 	} else {
 		mc.clearMarkers();
 	}
-	$("#reg-button").attr("src",showMarketClusterer?"img/p_b1.png":"img/p_b1_g.png");
+	$("#reg-button").attr("src",showMarketClusterer?"img/menu_reg.png":"img/menu_reg_g.png");
 }
 
 function loadPosolstvaData() {
@@ -90,7 +93,7 @@ function loadPosolstvaData() {
 
 				var marker = new google.maps.Marker({
 			  		title: data[i][2]+" в "+data[i][1],
-					icon: data[i][0]=="-1"? "img/pos7.png" : (izb!="" ? "img/pos5.png" : "img/pos4.png"),
+					icon: getPosIcon(izb!="", data[i][0]=="-1"),
 			  		position: new google.maps.LatLng(
 			      			data[i][7][0].replace(/(^\s*)|(\s*$)/g, ""), data[i][7][1].replace(/(^\s*)|(\s*$)/g, "")),
 			  		clickable: true,
@@ -125,7 +128,7 @@ function loadData() {
 			for (var i=0;i<data.length;i++) {
 				if (data[i].length>3)
 					markers[markers.length] = new google.maps.Marker({
-				  		title: data[i][2]==2 ? "Би помагал в организиране на секция" : data[i][2]==1 ? "Ще разпространява информация" : "Иска да гласува",
+				  		title: (data[i][2]==2 ? "Би помагал в организиране на секция" : data[i][2]==1 ? "Ще разпространява информация" : "Иска да гласува") + " в " + data[i][1],
 //						icon: data[i][2]==2 ? "img/p_or.png" : data[i][2]==1 ? "img/p_s.png" : "img/p_wait.png",
 						icon: "img/p_or.png",
 				  		position: new google.maps.LatLng(
@@ -141,19 +144,41 @@ function loadData() {
 }
 
 function PosolstvoControl(div,map) {
-	$("<img id=\"posolstvo-button\" src=\"img/pos_b1_g.png\""+
+	$("<img id=\"posolstvo-button\" src=\"img/menu_pos_g.png\""+
 	" alt=\"Покажи/скрий всички официални и почетни представителства\" title=\"Покажи/скрий всички официални и почетни представителства\"/>")
-	.click(togglePosolstva).appendTo($(div));	
+	.click(togglePosolstva).appendTo($(div))
+	.mouseover(function() { $(this).css("left","10px")})
+	.mouseout(function() { $(this).css("left","25px")});
 }
 function SekciiControl(div,map) {
-	$("<img id=\"sec-button\" src=\"img/p_v1_g.png\""+
+	$("<img id=\"sec-button\" src=\"img/menu_vote_g.png\""+
 	" alt=\"Покажи/скрий всички секции в последните избори\" title=\"Покажи/скрий всички секции в последните избори\"/>")
-	.click(toggleSekcii).appendTo($(div));	
+	.click(toggleSekcii).appendTo($(div))
+	.mouseover(function() { $(this).css("left","10px")})
+	.mouseout(function() { $(this).css("left","25px")});
 }
 function RegControl(div,map) {
-	$("<img id=\"reg-button\" src=\"img/p_b1.png\""+
+	$("<img id=\"reg-button\" src=\"img/menu_reg.png\""+
 	" alt=\"Покажи/скрий всички абонирани по света\" title=\"Покажи/скрий всички абонирани по света\"/>")
-	.click(toggleMarkerClusterer).appendTo($(div));	
+	.click(toggleMarkerClusterer).appendTo($(div))
+	.mouseover(function() { $(this).css("left","10px")})
+	.mouseout(function() { $(this).css("left","25px")});
+}
+
+function changedZoop() {
+	if (oldZoom==map.getZoom())
+		return;
+	if ((oldZoom<bigIconsFromZoom && map.getZoom()>=bigIconsFromZoom) ||
+		(oldZoom>=bigIconsFromZoom && map.getZoom()<bigIconsFromZoom)) {
+		for (i=0;i<posolstva.length;i++)
+			posolstva[i].setIcon(getPosIcon(posolstva[i].sekciq,posolstva[i].samoSekciq));
+	}
+	oldZoom=map.getZoom();
+}
+
+function getPosIcon(sekciq, samoSekciq) {
+	return map.getZoom()<bigIconsFromZoom ? (sekciq ? (samoSekciq ? "img/pos_small_v1.png" : "img/pos_small_pv1.png") : "img/pos_small_p1.png") :
+						 (sekciq ? (samoSekciq ? "img/pos7.png" : "img/pos5.png") : "img/pos4.png");
 }
 
 
@@ -161,12 +186,15 @@ function initialize() {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: new google.maps.LatLng(38, 15),
 		zoom: 2,
-		mapTypeId: 'terrain',
+		mapTypeId: google.maps.MapTypeId.TERRAIN,
 		streetViewControl: false,
-		mapTypeControlOptions: { mapTypeIds: [google.maps.MapTypeId.TERRAIN,google.maps.MapTypeId.HYBRID] } 
+		mapTypeControl: false
 	});
 	loadData();
 	loadPosolstvaData();
+
+	oldZoom=map.getZoom();
+	google.maps.event.addListener(map, 'zoom_changed', changedZoop);
 
 	var posControlDiv = document.createElement('div');
 	var posControl = new PosolstvoControl(posControlDiv, map);
@@ -186,3 +214,27 @@ function initialize() {
 }
 
 $(window).load(initialize);
+
+
+//MarkerClustererMod
+
+ClusterIcon.prototype.onAdd = function() {
+  this.div_ = document.createElement('DIV');
+  if (this.visible_) {
+    var pos = this.getPosFromLatLng_(this.center_);
+    this.div_.style.cssText = this.createCss(pos);
+    this.div_.innerHTML = this.sums_.text;
+    this.div_.title = "В този регион има "+this.sums_.text+" записали се. Кликнете, за да видите всички.";
+  }
+
+  var panes = this.getPanes();
+  panes.overlayMouseTarget.appendChild(this.div_);
+
+  var that = this;
+  google.maps.event.addDomListener(this.div_, 'click', function() {
+    that.triggerClusterClick();
+  });
+};
+
+ClusterIcon.prototype['onAdd'] = ClusterIcon.prototype.onAdd;
+
